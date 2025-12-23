@@ -19,11 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@/features/*": ["./features/*"],
-      "@/lib/*": ["./lib/*"],
-      "@/components/ui/*": ["./components/ui/*"]
-    }
+      "@/*": ["./src/*"]
+    },
+    "baseUrl": "."
   },
   "include": [
     "next-env.d.ts",

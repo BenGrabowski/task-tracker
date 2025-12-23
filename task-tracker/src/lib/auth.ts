@@ -21,22 +21,19 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // 1 day
   },
-  // Custom hooks for household association
-  hooks: {
-    after: [
-      {
-        matcher(context) {
-          return context.path === '/sign-up/email';
-        },
-        handler: async (ctx) => {
-          // After user signs up, they'll need to join or create a household
-          // This will be handled in the UI flow
-          console.log('New user registered:', ctx.user?.email);
-        },
+  secret: process.env.BETTER_AUTH_SECRET || 'fallback-secret-change-in-production',
+  baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
+  user: {
+    additionalFields: {
+      householdId: {
+        type: 'string',
+        required: false,
+        defaultValue: null,
+        input: false, // Don't allow user to set household during signup
       },
-    ],
+    },
   },
 });
 
 export type Session = typeof auth.$Infer.Session;
-export type User = typeof auth.$Infer.User;
+export type User = typeof auth.$Infer.Session.user;
