@@ -1,6 +1,6 @@
 # Implementation Plan
 
-- [x] 1. Set up project structure and core dependencies
+- [ ] 1. Set up project structure and core dependencies
   - Initialize Next.js 16 project with TypeScript
   - Install and configure Drizzle ORM, PostgreSQL client, and Better Auth
   - Install shadcn/ui, Tailwind CSS, React Hook Form, and Zod
@@ -8,8 +8,8 @@
   - Configure TypeScript paths for clean imports
   - _Requirements: 8.1, 8.4_
 
-- [-] 2. Configure database and authentication
-- [x] 2.1 Set up database schema and migrations
+- [ ] 2. Configure database and authentication
+- [ ] 2.1 Set up database schema and migrations
   - Create Drizzle schema definitions for households, users, categories, and tasks tables
   - Set up database connection and migration configuration
   - Create initial migration files
@@ -19,7 +19,7 @@
   - **Property 22: Data persistence immediacy**
   - **Validates: Requirements 8.1**
 
-- [x] 2.3 Configure Better Auth
+- [ ] 2.3 Configure Better Auth
   - Set up Better Auth configuration with email/password authentication
   - Create authentication middleware and session management
   - Implement household association logic for new users
