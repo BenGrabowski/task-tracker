@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db } from "./db/connection";
-import { households, user } from "./db/schema";
+import { db } from "@/lib/db/connection";
+import { households, user } from "@/lib/db/schema";
 
 export interface CreateHouseholdData {
   name: string;

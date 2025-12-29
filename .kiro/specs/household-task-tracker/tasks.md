@@ -15,23 +15,11 @@
   - Create initial migration files
   - _Requirements: 8.1, 7.1_
 
-- [ ]* 2.2 Write property test for database schema integrity
-  - **Property 22: Data persistence immediacy**
-  - **Validates: Requirements 8.1**
-
 - [ ] 2.3 Configure Better Auth
   - Set up Better Auth configuration with email/password authentication
   - Create authentication middleware and session management
   - Implement household association logic for new users
   - _Requirements: 7.1, 7.2, 7.3_
-
-- [ ]* 2.4 Write property test for user registration
-  - **Property 19: User registration completeness**
-  - **Validates: Requirements 7.1**
-
-- [ ]* 2.5 Write property test for authentication access control
-  - **Property 20: Authentication access control**
-  - **Validates: Requirements 7.2**
 
 - [ ] 3. Implement core data models and validation
 - [ ] 3.1 Create Zod validation schemas
@@ -39,23 +27,11 @@
   - Set up shared validation utilities and error handling
   - _Requirements: 8.4, 1.5_
 
-- [ ]* 3.2 Write property test for validation error handling
-  - **Property 23: Error handling appropriateness**
-  - **Validates: Requirements 8.4**
-
 - [ ] 3.3 Implement household management features
   - Create household creation and joining functionality
   - Implement household-scoped data access patterns
   - Set up user permission system within households
   - _Requirements: 7.3, 7.4, 2.4_
-
-- [ ]* 3.4 Write property test for household permission equality
-  - **Property 21: Household permission equality**
-  - **Validates: Requirements 7.4**
-
-- [ ]* 3.5 Write property test for assignment within household
-  - **Property 6: Assignment within household**
-  - **Validates: Requirements 2.1, 2.2, 2.4**
 
 - [ ] 4. Build authentication UI and flows
 - [ ] 4.1 Create authentication pages and components
@@ -75,18 +51,6 @@
   - Add household-scoped category queries
   - Set up category-task relationship management
   - _Requirements: 3.1, 3.2, 3.4_
-
-- [ ]* 5.2 Write property test for category household scoping
-  - **Property 8: Category household scoping**
-  - **Validates: Requirements 3.1**
-
-- [ ]* 5.3 Write property test for single category association
-  - **Property 9: Single category association**
-  - **Validates: Requirements 3.2**
-
-- [ ]* 5.4 Write property test for category deletion cleanup
-  - **Property 11: Category deletion cleanup**
-  - **Validates: Requirements 3.4**
 
 - [ ] 5.5 Build category UI components
   - Create category form and list components
