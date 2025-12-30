@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 import {
   createHouseholdAction,
   joinHouseholdAction,
-} from "@/features/auth/actions/auth-actions";
+} from "@/features/households/actions/household-actions";
 import {
   type CreateHouseholdInput,
   createHouseholdSchema,

@@ -1,7 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -21,14 +22,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signInAction } from "@/features/auth/actions/auth-actions";
 import {
   type SignInInput,
   signInSchema,
 } from "@/features/auth/schemas/auth-schemas";
+import { signIn } from "@/lib/auth-client";
 
 export default function LoginForm() {
-  const [pending, startTransition] = useTransition();
+  const router = useRouter();
+  const [pending, setPending] = useState(false);
 
   const form = useForm<SignInInput>({
     resolver: zodResolver(signInSchema),
@@ -38,29 +40,24 @@ export default function LoginForm() {
     },
   });
 
-  const onSubmit = (values: SignInInput) => {
-    startTransition(async () => {
-      form.clearErrors();
-      const result = await signInAction(values);
+  const onSubmit = async (values: SignInInput) => {
+    form.clearErrors();
+    setPending(true);
 
-      if (!result.success) {
-        if (result.fieldErrors) {
-          Object.entries(result.fieldErrors).forEach(([fieldName, message]) => {
-            form.setError(fieldName as "email" | "password", {
-              type: "server",
-              message,
-            });
-          });
-        }
+    const result = await signIn.email(values);
 
-        if (result.formError) {
-          form.setError("root", {
-            type: "server",
-            message: result.formError,
-          });
-        }
-      }
-    });
+    setPending(false);
+
+    if (result.error) {
+      form.setError("root", {
+        type: "server",
+        message: result.error.message ?? "Invalid email or password",
+      });
+      return;
+    }
+
+    // Redirect to dashboard (middleware will redirect to household setup if needed)
+    router.push("/dashboard");
   };
 
   return (

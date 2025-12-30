@@ -42,24 +42,24 @@
 	- _Requirements: 7.1, 7.2, 7.3_
 
 ## 5. Implement Category Management System
-- [ ] 5.1 Create category data layer
+- [x] 5.1 Create category data layer
 	- Implement category Server Actions (create, read, update, delete)
 	- Add household-scoped category queries
 	- Set up category-task relationship management
 	- _Requirements: 3.1, 3.2, 3.4_
-- [ ] 5.5 Build category UI components
+- [x] 5.2 Build category UI components
 	- Create category form and list components
 	- Implement category selection and management interfaces
 	- Add category filtering functionality
 	- _Requirements: 3.1, 3.2, 3.3_
 
 ## 6. Develop Core Task Management Functionality
-- [ ] 6.1 Implement task data layer
+- [x] 6.1 Implement task data layer
 	- Create task Server Actions for CRUD operations
 	- Implement task status management and validation
 	- Add task assignment and household scoping
 	- _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 2.1, 2.2_
-- [ ] 6.7 Build task UI components
+- [ ] 6.2 Build task UI components
 	- Create task form component with all fields and validation
 	- Implement task list and task item display components
 	- Add task status management and assignment interfaces
@@ -71,7 +71,7 @@
 	- Add circular dependency prevention
 	- Create dependency-aware status change validation
 	- _Requirements: 4.1, 4.2, 4.4_
-- [ ] 7.5 Build dependency UI features
+- [ ] 7.2 Build dependency UI features
 	- Add dependency selection and management to task forms
 	- Implement blocked task visual indicators
 	- Create dependency relationship displays
@@ -95,7 +95,7 @@
 	- Add notification persistence for overdue tasks
 	- Create assignee-only notification rules
 	- _Requirements: 6.1, 6.2, 6.3_
-- [ ] 9.3 Build notification UI
+- [ ] 9.2 Build notification UI
 	- Create in-app notification center component
 	- Add notification display and dismissal functionality
 	- Implement notification indicators in task views

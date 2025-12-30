@@ -1,7 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -21,14 +22,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signUpAction } from "@/features/auth/actions/auth-actions";
 import {
   type SignUpInput,
   signUpSchema,
 } from "@/features/auth/schemas/auth-schemas";
+import { signUp } from "@/lib/auth-client";
 
 export default function RegisterForm() {
-  const [pending, startTransition] = useTransition();
+  const router = useRouter();
+  const [pending, setPending] = useState(false);
 
   const form = useForm<SignUpInput>({
     resolver: zodResolver(signUpSchema),
@@ -40,29 +42,25 @@ export default function RegisterForm() {
     },
   });
 
-  const onSubmit = (values: SignUpInput) => {
-    startTransition(async () => {
-      form.clearErrors();
-      const result = await signUpAction(values);
+  const onSubmit = async (values: SignUpInput) => {
+    form.clearErrors();
+    setPending(true);
 
-      if (!result.success) {
-        if (result.fieldErrors) {
-          Object.entries(result.fieldErrors).forEach(([fieldName, message]) => {
-            form.setError(
-              fieldName as "name" | "email" | "password" | "confirmPassword",
-              { type: "server", message },
-            );
-          });
-        }
+    const { confirmPassword: _confirmPassword, ...signUpData } = values;
+    const result = await signUp.email(signUpData);
 
-        if (result.formError) {
-          form.setError("root", {
-            type: "server",
-            message: result.formError,
-          });
-        }
-      }
-    });
+    setPending(false);
+
+    if (result.error) {
+      form.setError("root", {
+        type: "server",
+        message: result.error.message ?? "Sign up failed",
+      });
+      return;
+    }
+
+    // Redirect to household setup since new users don't have a household
+    router.push("/household/setup");
   };
 
   return (
