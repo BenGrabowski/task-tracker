@@ -1,18 +1,18 @@
 "use server";
 
-import { and, eq, or, ilike, lte, isNull, ne, sql } from "drizzle-orm";
+import { and, eq, ilike, isNull, lte, ne, or, sql } from "drizzle-orm";
 import { db } from "@/lib/db/connection";
-import { tasks, user, categories } from "@/lib/db/schema";
+import { categories, tasks, user } from "@/lib/db/schema";
 import { requireHousehold } from "@/lib/session";
 import {
   type CreateTaskInput,
   createTaskSchema,
-  type UpdateTaskInput,
-  updateTaskSchema,
-  type TaskFilterInput,
-  taskFilterSchema,
   type DeleteTaskInput,
   deleteTaskSchema,
+  type TaskFilterInput,
+  taskFilterSchema,
+  type UpdateTaskInput,
+  updateTaskSchema,
 } from "../schemas/task-schemas";
 
 // Helper to get a task with household scoping
@@ -41,7 +41,10 @@ async function isCategoryInHousehold(categoryId: string, householdId: string) {
     .select({ id: categories.id })
     .from(categories)
     .where(
-      and(eq(categories.id, categoryId), eq(categories.householdId, householdId))
+      and(
+        eq(categories.id, categoryId),
+        eq(categories.householdId, householdId),
+      ),
     )
     .limit(1);
   return !!category;
@@ -51,7 +54,7 @@ async function isCategoryInHousehold(categoryId: string, householdId: string) {
 async function wouldCreateCycle(
   taskId: string,
   blockedByTaskId: string,
-  householdId: string
+  householdId: string,
 ): Promise<boolean> {
   // Check if blockedByTaskId is blocked (directly or transitively) by taskId
   const visited = new Set<string>();
@@ -92,7 +95,7 @@ export async function createTask(input: CreateTaskInput) {
     if (validatedData.assigneeId) {
       const assigneeInHousehold = await isUserInHousehold(
         validatedData.assigneeId,
-        householdId
+        householdId,
       );
       if (!assigneeInHousehold) {
         return {
@@ -106,7 +109,7 @@ export async function createTask(input: CreateTaskInput) {
     if (validatedData.categoryId) {
       const categoryInHousehold = await isCategoryInHousehold(
         validatedData.categoryId,
-        householdId
+        householdId,
       );
       if (!categoryInHousehold) {
         return {
@@ -120,7 +123,7 @@ export async function createTask(input: CreateTaskInput) {
     if (validatedData.blockedByTaskId) {
       const blockingTask = await getTaskInHousehold(
         validatedData.blockedByTaskId,
-        householdId
+        householdId,
       );
       if (!blockingTask) {
         return {
@@ -200,8 +203,8 @@ export async function getTasks(filter?: TaskFilterInput) {
       conditions.push(
         or(
           ilike(tasks.title, `%${validatedFilter.search}%`),
-          ilike(tasks.description, `%${validatedFilter.search}%`)
-        )!
+          ilike(tasks.description, `%${validatedFilter.search}%`),
+        )!,
       );
     }
 
@@ -326,7 +329,7 @@ export async function updateTask(taskId: string, input: UpdateTaskInput) {
       if (currentTask.blockedByTaskId) {
         const blockingTask = await getTaskInHousehold(
           currentTask.blockedByTaskId,
-          householdId
+          householdId,
         );
         if (blockingTask && blockingTask.status !== "done") {
           return {
@@ -341,7 +344,7 @@ export async function updateTask(taskId: string, input: UpdateTaskInput) {
     if (validatedData.assigneeId) {
       const assigneeInHousehold = await isUserInHousehold(
         validatedData.assigneeId,
-        householdId
+        householdId,
       );
       if (!assigneeInHousehold) {
         return {
@@ -355,7 +358,7 @@ export async function updateTask(taskId: string, input: UpdateTaskInput) {
     if (validatedData.categoryId) {
       const categoryInHousehold = await isCategoryInHousehold(
         validatedData.categoryId,
-        householdId
+        householdId,
       );
       if (!categoryInHousehold) {
         return {
@@ -371,7 +374,7 @@ export async function updateTask(taskId: string, input: UpdateTaskInput) {
         // Check that blocking task exists
         const blockingTask = await getTaskInHousehold(
           validatedData.blockedByTaskId,
-          householdId
+          householdId,
         );
         if (!blockingTask) {
           return {
@@ -385,7 +388,7 @@ export async function updateTask(taskId: string, input: UpdateTaskInput) {
         const wouldCycle = await wouldCreateCycle(
           taskId,
           validatedData.blockedByTaskId,
-          householdId
+          householdId,
         );
         if (wouldCycle) {
           return {
@@ -432,7 +435,10 @@ export async function updateTask(taskId: string, input: UpdateTaskInput) {
         updateValues.completedAt = new Date();
       }
       // Clear completedAt when changing from done to another status
-      else if (validatedData.status !== "done" && currentTask.status === "done") {
+      else if (
+        validatedData.status !== "done" &&
+        currentTask.status === "done"
+      ) {
         updateValues.completedAt = null;
       }
     }
@@ -479,8 +485,8 @@ export async function deleteTask(input: DeleteTaskInput) {
       .where(
         and(
           eq(tasks.blockedByTaskId, taskId),
-          eq(tasks.householdId, householdId)
-        )
+          eq(tasks.householdId, householdId),
+        ),
       );
 
     // Delete the task (only if it belongs to user's household)
@@ -525,7 +531,7 @@ export async function getTodayTasks() {
       where: and(
         eq(tasks.householdId, householdId),
         ne(tasks.status, "done"),
-        lte(tasks.dueDate, today)
+        lte(tasks.dueDate, today),
       ),
       with: {
         assignee: {

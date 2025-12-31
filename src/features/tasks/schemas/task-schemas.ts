@@ -26,11 +26,36 @@ export const createTaskSchema = z.object({
   dueDate: z.coerce.date().optional().nullable(),
   // User IDs are text (not UUID) in Better Auth
   assigneeId: z.string().min(1, "Invalid assignee ID").optional().nullable(),
-  categoryId: z.string().regex(uuidRegex, "Invalid category ID").optional().nullable(),
+  categoryId: z
+    .string()
+    .regex(uuidRegex, "Invalid category ID")
+    .optional()
+    .nullable(),
   blockedByTaskId: z
     .string()
     .regex(uuidRegex, "Invalid blocking task ID")
     .optional()
+    .nullable(),
+});
+
+// Form schema for React Hook Form - explicit types without defaults
+export const taskFormSchema = z.object({
+  title: z
+    .string()
+    .min(1, "Title is required")
+    .max(200, "Title must be 200 characters or less")
+    .trim(),
+  description: z
+    .string()
+    .max(1000, "Description must be 1000 characters or less")
+    .nullable(),
+  priority: taskPriorityEnum,
+  dueDate: z.date().nullable(),
+  assigneeId: z.string().min(1, "Invalid assignee ID").nullable(),
+  categoryId: z.string().regex(uuidRegex, "Invalid category ID").nullable(),
+  blockedByTaskId: z
+    .string()
+    .regex(uuidRegex, "Invalid blocking task ID")
     .nullable(),
 });
 
@@ -72,6 +97,7 @@ export const deleteTaskSchema = z.object({
 
 // Type exports for use in components and actions
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
+export type TaskFormInput = z.infer<typeof taskFormSchema>;
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 export type TaskFilterInput = z.infer<typeof taskFilterSchema>;
 export type CompleteTaskInput = z.infer<typeof completeTaskSchema>;
