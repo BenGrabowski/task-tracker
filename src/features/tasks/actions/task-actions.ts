@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq, ilike, isNull, lte, ne, or, sql } from "drizzle-orm";
+import { and, eq, ilike, lte, ne, or } from "drizzle-orm";
 import { db } from "@/lib/db/connection";
 import { categories, tasks, user } from "@/lib/db/schema";
 import { requireHousehold } from "@/lib/session";
@@ -61,8 +61,8 @@ async function wouldCreateCycle(
   const queue = [blockedByTaskId];
 
   while (queue.length > 0) {
-    const currentId = queue.shift()!;
-    if (visited.has(currentId)) continue;
+    const currentId = queue.shift();
+    if (!currentId || visited.has(currentId)) continue;
     visited.add(currentId);
 
     // If we reach the original task, we have a cycle
@@ -200,12 +200,13 @@ export async function getTasks(filter?: TaskFilterInput) {
     }
 
     if (validatedFilter?.search) {
-      conditions.push(
-        or(
-          ilike(tasks.title, `%${validatedFilter.search}%`),
-          ilike(tasks.description, `%${validatedFilter.search}%`),
-        )!,
+      const searchCondition = or(
+        ilike(tasks.title, `%${validatedFilter.search}%`),
+        ilike(tasks.description, `%${validatedFilter.search}%`),
       );
+      if (searchCondition) {
+        conditions.push(searchCondition);
+      }
     }
 
     const householdTasks = await db.query.tasks.findMany({

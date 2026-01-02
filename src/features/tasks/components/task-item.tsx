@@ -18,6 +18,7 @@ interface TaskItemProps {
   task: Task;
   onEdit?: (task: Task) => void;
   onTaskChange?: () => void;
+  dependents?: Task[];
 }
 
 const STATUS_OPTIONS: { value: TaskStatus; label: string }[] = [
@@ -70,11 +71,17 @@ function isOverdue(date: Date | null, status: TaskStatus): boolean {
   return d < now && d.toDateString() !== now.toDateString();
 }
 
-export function TaskItem({ task, onEdit, onTaskChange }: TaskItemProps) {
+export function TaskItem({
+  task,
+  onEdit,
+  onTaskChange,
+  dependents = [],
+}: TaskItemProps) {
   const [pending, startTransition] = useTransition();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const isBlocked = task.blockedBy !== null && task.blockedBy.status !== "done";
+  const isBlockingOthers = dependents.length > 0;
   const taskIsOverdue = isOverdue(task.dueDate, task.status);
   const taskIsDueToday = isDueToday(task.dueDate);
 
@@ -98,7 +105,9 @@ export function TaskItem({ task, onEdit, onTaskChange }: TaskItemProps) {
   };
 
   return (
-    <Card className={`py-3 ${task.status === "done" ? "opacity-60" : ""}`}>
+    <Card
+      className={`py-3 ${task.status === "done" ? "opacity-60" : ""} ${isBlocked ? "border-amber-200 bg-amber-50/40 dark:border-amber-900/40 dark:bg-amber-900/10" : ""}`}
+    >
       <CardContent className="pt-0 space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
@@ -115,9 +124,17 @@ export function TaskItem({ task, onEdit, onTaskChange }: TaskItemProps) {
               {isBlocked && (
                 <Badge
                   variant="outline"
-                  className="text-amber-600 border-amber-300 text-xs"
+                  className="text-amber-700 border-amber-300 bg-amber-100 text-xs dark:text-amber-400 dark:border-amber-900"
                 >
                   Blocked
+                </Badge>
+              )}
+              {isBlockingOthers && (
+                <Badge
+                  variant="outline"
+                  className="text-sky-700 border-sky-200 bg-sky-50 text-xs dark:text-sky-300 dark:border-sky-900"
+                >
+                  Blocking {dependents.length}
                 </Badge>
               )}
             </div>
@@ -126,6 +143,11 @@ export function TaskItem({ task, onEdit, onTaskChange }: TaskItemProps) {
                 {task.description}
               </p>
             )}
+            {isBlocked && task.blockedBy ? (
+              <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                Waiting on {task.blockedBy.title}
+              </p>
+            ) : null}
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
@@ -205,6 +227,17 @@ export function TaskItem({ task, onEdit, onTaskChange }: TaskItemProps) {
             </span>
           )}
         </div>
+
+        {isBlockingOthers ? (
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <span className="text-muted-foreground">Blocks:</span>
+            {dependents.map((dependent) => (
+              <Badge key={dependent.id} variant="secondary" className="text-xs">
+                {dependent.title}
+              </Badge>
+            ))}
+          </div>
+        ) : null}
 
         <div className="flex items-center gap-2 pt-1 border-t">
           {onEdit && (

@@ -67,7 +67,7 @@ export const updateTaskSchema = createTaskSchema.partial().extend({
 // Task filter schema for search and filtering
 export const taskFilterSchema = z.object({
   status: taskStatusEnum.optional(),
-  assigneeId: z.string().regex(uuidRegex, "Invalid assignee ID").optional(),
+  assigneeId: z.string().min(1, "Invalid assignee ID").optional(),
   categoryId: z.string().regex(uuidRegex, "Invalid category ID").optional(),
   search: z.string().max(200, "Search query too long").optional(),
   dueDate: z.date().optional(),

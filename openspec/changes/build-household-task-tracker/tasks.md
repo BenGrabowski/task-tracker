@@ -11,7 +11,7 @@
 - _Requirements: 8.1, 8.4_
 
 ## 2. Configure Database And Authentication
-	
+
 - [x] 2.1 Set up database schema and migrations
 	- Create Drizzle schema definitions for households, users, categories, and tasks tables
 	- Set up database connection and migration configuration
@@ -66,24 +66,24 @@
 	- _Requirements: 1.1, 1.2, 1.3, 1.4, 2.3_
 
 ## 7. Implement Task Dependency System
-- [ ] 7.1 Create dependency management logic
+- [x] 7.1 Create dependency management logic
 	- Implement dependency creation and validation
 	- Add circular dependency prevention
 	- Create dependency-aware status change validation
 	- _Requirements: 4.1, 4.2, 4.4_
-- [ ] 7.2 Build dependency UI features
+- [x] 7.2 Build dependency UI features
 	- Add dependency selection and management to task forms
 	- Implement blocked task visual indicators
 	- Create dependency relationship displays
 	- _Requirements: 4.3_
 
 ## 8. Create Task Views And Filtering System
-- [ ] 8.1 Implement task list views
+ - [x] 8.1 Implement task list views
 	- Create default task list view with all household tasks
 	- Build today/overdue view with date-based filtering
 	- Add search functionality across task titles and descriptions
 	- _Requirements: 5.1, 5.2, 5.3_
-- [ ] 8.3 Build filtering and search UI
+ - [x] 8.3 Build filtering and search UI
 	- Create filter components for status, category, and assignee
 	- Implement search input with real-time results
 	- Add filter combination and clearing functionality

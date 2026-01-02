@@ -43,6 +43,7 @@ interface TaskFormProps {
     assigneeId: string | null;
     categoryId: string | null;
     blockedByTaskId: string | null;
+    blockedBy?: TaskSummary | null;
   };
   categories: Category[];
   members: HouseholdMember[];
@@ -93,6 +94,27 @@ export function TaskForm({
       blockedByTaskId: task?.blockedByTaskId ?? null,
     },
   });
+
+  const blockingOptions = (() => {
+    if (!task?.blockedBy || !task.blockedByTaskId) {
+      return availableBlockingTasks;
+    }
+
+    const existsInOptions = availableBlockingTasks.some(
+      (t) => t.id === task.blockedByTaskId,
+    );
+
+    if (existsInOptions) return availableBlockingTasks;
+
+    return [
+      ...availableBlockingTasks,
+      {
+        id: task.blockedByTaskId,
+        title: task.blockedBy.title,
+        status: task.blockedBy.status,
+      },
+    ];
+  })();
 
   const onSubmit = (values: TaskFormInput) => {
     startTransition(async () => {
@@ -295,40 +317,44 @@ export function TaskForm({
           />
         </div>
 
-        {availableBlockingTasks.length > 0 && (
-          <FormField
-            control={form.control}
-            name="blockedByTaskId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Blocked by (optional)</FormLabel>
-                <Select
-                  onValueChange={(val) =>
-                    field.onChange(val === "" ? null : val)
-                  }
-                  value={field.value ?? ""}
-                >
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Not blocked" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="">
-                      <span className="text-muted-foreground">Not blocked</span>
+        <FormField
+          control={form.control}
+          name="blockedByTaskId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Blocked by (optional)</FormLabel>
+              <Select
+                onValueChange={(val) => field.onChange(val === "" ? null : val)}
+                value={field.value ?? ""}
+                disabled={blockingOptions.length === 0}
+              >
+                <FormControl>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Not blocked" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="">
+                    <span className="text-muted-foreground">Not blocked</span>
+                  </SelectItem>
+                  {blockingOptions.length === 0 ? (
+                    <SelectItem value="" disabled>
+                      <span className="text-muted-foreground">
+                        No available blockers
+                      </span>
                     </SelectItem>
-                    {availableBlockingTasks.map((blockingTask) => (
-                      <SelectItem key={blockingTask.id} value={blockingTask.id}>
-                        {blockingTask.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
+                  ) : null}
+                  {blockingOptions.map((blockingTask) => (
+                    <SelectItem key={blockingTask.id} value={blockingTask.id}>
+                      {blockingTask.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {form.formState.errors.root?.message ? (
           <p className="text-destructive text-sm">

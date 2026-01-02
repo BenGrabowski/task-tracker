@@ -24,6 +24,17 @@ export function TaskList({
     );
   }
 
+  const dependentsByTaskId = tasks.reduce<Record<string, Task[]>>(
+    (acc, task) => {
+      if (task.blockedByTaskId) {
+        const list = acc[task.blockedByTaskId] ?? [];
+        acc[task.blockedByTaskId] = [...list, task];
+      }
+      return acc;
+    },
+    {},
+  );
+
   return (
     <div className="space-y-3">
       {tasks.map((task) => (
@@ -32,6 +43,7 @@ export function TaskList({
           task={task}
           onEdit={onEditTask}
           onTaskChange={onTaskChange}
+          dependents={dependentsByTaskId[task.id] ?? []}
         />
       ))}
     </div>
