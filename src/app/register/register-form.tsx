@@ -26,7 +26,7 @@ import {
   type SignUpInput,
   signUpSchema,
 } from "@/features/auth/schemas/auth-schemas";
-import { signUp } from "@/lib/auth-client";
+import { signUp } from "@/features/auth/client";
 
 export default function RegisterForm() {
   const router = useRouter();

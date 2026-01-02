@@ -102,12 +102,12 @@
 	- _Requirements: 6.1, 6.2_
 
 ## 10. Create Main Application Layout And Navigation
-- [ ] 10.1 Build root layout and navigation
+- [x] 10.1 Build root layout and navigation
 	- Create main application layout with navigation
 	- Implement dashboard layout with sidebar and main content
 	- Add responsive design and mobile navigation
 	- _Requirements: 5.1_
-- [ ] 10.2 Implement dashboard pages
+- [x] 10.2 Implement dashboard pages
 	- Create main dashboard page with task list
 	- Build today/overdue view page
 	- Add page layouts and loading states

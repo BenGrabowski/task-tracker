@@ -26,7 +26,7 @@ import {
   type SignInInput,
   signInSchema,
 } from "@/features/auth/schemas/auth-schemas";
-import { signIn } from "@/lib/auth-client";
+import { signIn } from "@/features/auth/client";
 
 export default function LoginForm() {
   const router = useRouter();
