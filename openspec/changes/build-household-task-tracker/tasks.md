@@ -41,97 +41,109 @@
 	- Create household onboarding flow for new users
 	- _Requirements: 7.1, 7.2, 7.3_
 
-## 5. Implement Category Management System
-- [x] 5.1 Create category data layer
+## 5. Build Household Management UI
+- [x] 5.1 Create household settings page
+	- Build household info display and edit functionality
+	- Implement member list showing all household members
+	- Add household management navigation to dashboard sidebar
+	- _Requirements: 7.3, 7.4_
+- [x] 5.2 Implement household invite system
+	- Create invite code/link generation functionality
+	- Build join household page for invited users
+	- Add invite management UI for existing members
+	- _Requirements: 7.3_
+
+## 6. Implement Category Management System
+- [x] 6.1 Create category data layer
 	- Implement category Server Actions (create, read, update, delete)
 	- Add household-scoped category queries
 	- Set up category-task relationship management
 	- _Requirements: 3.1, 3.2, 3.4_
-- [x] 5.2 Build category UI components
+- [x] 6.2 Build category UI components
 	- Create category form and list components
 	- Implement category selection and management interfaces
 	- Add category filtering functionality
 	- _Requirements: 3.1, 3.2, 3.3_
 
-## 6. Develop Core Task Management Functionality
-- [x] 6.1 Implement task data layer
+## 7. Develop Core Task Management Functionality
+- [x] 7.1 Implement task data layer
 	- Create task Server Actions for CRUD operations
 	- Implement task status management and validation
 	- Add task assignment and household scoping
 	- _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 2.1, 2.2_
-- [x] 6.2 Build task UI components
+- [x] 7.2 Build task UI components
 	- Create task form component with all fields and validation
 	- Implement task list and task item display components
 	- Add task status management and assignment interfaces
 	- _Requirements: 1.1, 1.2, 1.3, 1.4, 2.3_
 
-## 7. Implement Task Dependency System
-- [x] 7.1 Create dependency management logic
+## 8. Implement Task Dependency System
+- [x] 8.1 Create dependency management logic
 	- Implement dependency creation and validation
 	- Add circular dependency prevention
 	- Create dependency-aware status change validation
 	- _Requirements: 4.1, 4.2, 4.4_
-- [x] 7.2 Build dependency UI features
+- [x] 8.2 Build dependency UI features
 	- Add dependency selection and management to task forms
 	- Implement blocked task visual indicators
 	- Create dependency relationship displays
 	- _Requirements: 4.3_
 
-## 8. Create Task Views And Filtering System
- - [x] 8.1 Implement task list views
+## 9. Create Task Views And Filtering System
+ - [x] 9.1 Implement task list views
 	- Create default task list view with all household tasks
 	- Build today/overdue view with date-based filtering
 	- Add search functionality across task titles and descriptions
 	- _Requirements: 5.1, 5.2, 5.3_
- - [x] 8.3 Build filtering and search UI
+ - [x] 9.2 Build filtering and search UI
 	- Create filter components for status, category, and assignee
 	- Implement search input with real-time results
 	- Add filter combination and clearing functionality
 	- _Requirements: 5.3, 5.4_
 
-## 9. Implement Notification System
-- [ ] 9.1 Create notification logic
+## 10. Implement Notification System
+- [ ] 10.1 Create notification logic
 	- Implement due date notification generation
 	- Add notification persistence for overdue tasks
 	- Create assignee-only notification rules
 	- _Requirements: 6.1, 6.2, 6.3_
-- [ ] 9.2 Build notification UI
+- [ ] 10.2 Build notification UI
 	- Create in-app notification center component
 	- Add notification display and dismissal functionality
 	- Implement notification indicators in task views
 	- _Requirements: 6.1, 6.2_
 
-## 10. Create Main Application Layout And Navigation
-- [x] 10.1 Build root layout and navigation
+## 11. Create Main Application Layout And Navigation
+- [x] 11.1 Build root layout and navigation
 	- Create main application layout with navigation
 	- Implement dashboard layout with sidebar and main content
 	- Add responsive design and mobile navigation
 	- _Requirements: 5.1_
-- [x] 10.2 Implement dashboard pages
+- [x] 11.2 Implement dashboard pages
 	- Create main dashboard page with task list
 	- Build today/overdue view page
 	- Add page layouts and loading states
 	- _Requirements: 5.1, 5.2_
 
-## 11. Add Error Handling And Loading States
-- [ ] 11.1 Implement comprehensive error handling
+## 12. Add Error Handling And Loading States
+- [ ] 12.1 Implement comprehensive error handling
 	- Add error boundaries and fallback UI components
 	- Create user-friendly error messages for all operations
 	- Implement retry mechanisms for failed operations
 	- _Requirements: 8.3_
-- [ ] 11.2 Add loading and optimistic updates
+- [ ] 12.2 Add loading and optimistic updates
 	- Implement loading states for all async operations
 	- Add optimistic updates for better user experience
 	- Create skeleton components for loading states
 	- _Requirements: 8.1_
 
-## 12. Final Integration And Testing
-- [ ] 12.1 Integration testing and bug fixes
+## 13. Final Integration And Testing
+- [ ] 13.1 Integration testing and bug fixes
 	- Test complete user workflows end-to-end
 	- Fix any integration issues between features
 	- Verify all requirements are met
 	- _Requirements: All_
 
-## 13. Checkpoint
-- [ ] 13.1 Ensure all tests pass
+## 14. Checkpoint
+- [ ] 14.1 Ensure all tests pass
 	- Ensure all tests pass, ask the user if questions arise.

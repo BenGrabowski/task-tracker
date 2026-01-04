@@ -3,6 +3,7 @@ import { auth } from "@/features/auth";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const isInviteRoute = pathname.startsWith("/invite");
 
   // Skip middleware for API routes, static files, and auth routes
   if (
@@ -21,7 +22,7 @@ export async function middleware(request: NextRequest) {
 
   // Public routes that don't require authentication
   const publicRoutes = ["/login", "/register", "/"];
-  const isPublicRoute = publicRoutes.includes(pathname);
+  const isPublicRoute = publicRoutes.includes(pathname) || isInviteRoute;
 
   // If no session and trying to access protected route, redirect to login
   if (!session && !isPublicRoute) {
@@ -34,7 +35,8 @@ export async function middleware(request: NextRequest) {
   if (
     session?.user &&
     !session.user.householdId &&
-    pathname !== "/household/setup"
+    pathname !== "/household/setup" &&
+    !isInviteRoute
   ) {
     return NextResponse.redirect(new URL("/household/setup", request.url));
   }

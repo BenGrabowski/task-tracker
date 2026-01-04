@@ -11,12 +11,12 @@ import type { TaskStatus } from "@/lib/types";
 import { TasksPageClient } from "./tasks-page-client";
 
 interface TasksPageProps {
-  searchParams?: {
+  searchParams?: Promise<{
     q?: string;
     status?: string;
     categoryId?: string;
     assigneeId?: string;
-  };
+  }>;
 }
 
 export default async function TasksPage({ searchParams }: TasksPageProps) {
@@ -26,14 +26,16 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
     redirect("/household/setup");
   }
 
+  const resolvedParams = await searchParams;
+
   const searchQuery =
-    typeof searchParams?.q === "string" ? searchParams.q.trim() : undefined;
+    typeof resolvedParams?.q === "string" ? resolvedParams.q.trim() : undefined;
 
   const allowedStatuses: TaskStatus[] = ["todo", "in_progress", "done"];
 
   const statusQueryRaw =
-    typeof searchParams?.status === "string"
-      ? searchParams.status.trim()
+    typeof resolvedParams?.status === "string"
+      ? resolvedParams.status.trim()
       : undefined;
 
   const statusQuery = allowedStatuses.includes(statusQueryRaw as TaskStatus)
@@ -41,13 +43,13 @@ export default async function TasksPage({ searchParams }: TasksPageProps) {
     : undefined;
 
   const categoryQuery =
-    typeof searchParams?.categoryId === "string"
-      ? searchParams.categoryId.trim()
+    typeof resolvedParams?.categoryId === "string"
+      ? resolvedParams.categoryId.trim()
       : undefined;
 
   const assigneeQuery =
-    typeof searchParams?.assigneeId === "string"
-      ? searchParams.assigneeId.trim()
+    typeof resolvedParams?.assigneeId === "string"
+      ? resolvedParams.assigneeId.trim()
       : undefined;
 
   const filters: Parameters<typeof getTasks>[0] = {

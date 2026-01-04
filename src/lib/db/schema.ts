@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   index,
+  integer,
   pgTable,
   text,
   timestamp,
@@ -127,11 +128,29 @@ export const tasks = pgTable("tasks", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// Household invites table
+export const householdInvites = pgTable("household_invites", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  code: text("code").notNull().unique(),
+  householdId: uuid("household_id")
+    .notNull()
+    .references(() => households.id),
+  createdByUserId: text("created_by_user_id")
+    .notNull()
+    .references(() => user.id),
+  expiresAt: timestamp("expires_at"),
+  maxUses: integer("max_uses").notNull().default(1),
+  useCount: integer("use_count").notNull().default(0),
+  revoked: boolean("revoked").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Relations
 export const householdsRelations = relations(households, ({ many }) => ({
   users: many(user),
   categories: many(categories),
   tasks: many(tasks),
+  invites: many(householdInvites),
 }));
 
 // Better Auth relations
@@ -143,6 +162,7 @@ export const userRelations = relations(user, ({ one, many }) => ({
   sessions: many(session),
   accounts: many(account),
   assignedTasks: many(tasks),
+  createdInvites: many(householdInvites),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -190,3 +210,17 @@ export const tasksRelations = relations(tasks, ({ one, many }) => ({
     relationName: "TaskDependency",
   }),
 }));
+
+export const householdInviteRelations = relations(
+  householdInvites,
+  ({ one }) => ({
+    household: one(households, {
+      fields: [householdInvites.householdId],
+      references: [households.id],
+    }),
+    createdBy: one(user, {
+      fields: [householdInvites.createdByUserId],
+      references: [user.id],
+    }),
+  }),
+);

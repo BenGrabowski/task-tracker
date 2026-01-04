@@ -225,12 +225,15 @@ export function TasksPageClient({
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
-              <Select value={status} onValueChange={setStatus}>
+              <Select
+                value={status || "all"}
+                onValueChange={(value) => setStatus(value === "all" ? "" : value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All statuses</SelectItem>
+                  <SelectItem value="all">All statuses</SelectItem>
                   <SelectItem value="todo">To Do</SelectItem>
                   <SelectItem value="in_progress">In Progress</SelectItem>
                   <SelectItem value="done">Done</SelectItem>
@@ -238,14 +241,14 @@ export function TasksPageClient({
               </Select>
 
               <Select
-                value={categoryId}
-                onValueChange={(value) => setCategoryId(value)}
+                value={categoryId || "all"}
+                onValueChange={(value) => setCategoryId(value === "all" ? "" : value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All categories</SelectItem>
+                  <SelectItem value="all">All categories</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}
@@ -255,14 +258,14 @@ export function TasksPageClient({
               </Select>
 
               <Select
-                value={assigneeId}
-                onValueChange={(value) => setAssigneeId(value)}
+                value={assigneeId || "all"}
+                onValueChange={(value) => setAssigneeId(value === "all" ? "" : value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Assignee" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All assignees</SelectItem>
+                  <SelectItem value="all">All assignees</SelectItem>
                   {members.map((member) => (
                     <SelectItem key={member.id} value={member.id}>
                       {member.name}

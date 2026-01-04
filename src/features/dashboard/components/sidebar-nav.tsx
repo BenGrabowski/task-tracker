@@ -3,6 +3,7 @@
 import {
   CalendarClock,
   FolderOpen,
+  Home,
   LayoutDashboard,
   ListTodo,
 } from "lucide-react";
@@ -31,6 +32,11 @@ const navItems = [
     title: "Categories",
     href: "/dashboard/categories",
     icon: FolderOpen,
+  },
+  {
+    title: "Household",
+    href: "/dashboard/household",
+    icon: Home,
   },
 ];
 
