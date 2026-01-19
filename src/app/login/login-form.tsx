@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -30,6 +30,7 @@ import { signIn } from "@/features/auth/client";
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [pending, setPending] = useState(false);
 
   const form = useForm<SignInInput>({
@@ -56,8 +57,9 @@ export default function LoginForm() {
       return;
     }
 
-    // Redirect to dashboard (middleware will redirect to household setup if needed)
-    router.push("/dashboard");
+    // Redirect to specified URL or dashboard
+    const redirect = searchParams.get("redirect");
+    router.push(redirect ?? "/dashboard");
   };
 
   return (

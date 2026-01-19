@@ -1,14 +1,7 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import {
-  type FormEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useTransition,
-} from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { type FormEvent, useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -58,29 +51,12 @@ export function TasksPageClient({
   const [categoryId, setCategoryId] = useState(initialCategoryId);
   const [assigneeId, setAssigneeId] = useState(initialAssigneeId);
   const [pending, startTransition] = useTransition();
-  const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
-  const hasMountedRef = useRef(false);
+
   const hasFilters = Boolean(
     searchTerm.trim() || status || categoryId || assigneeId,
   );
-
-  useEffect(() => {
-    setSearchTerm(initialSearch);
-  }, [initialSearch]);
-
-  useEffect(() => {
-    setStatus(initialStatus);
-  }, [initialStatus]);
-
-  useEffect(() => {
-    setCategoryId(initialCategoryId);
-  }, [initialCategoryId]);
-
-  useEffect(() => {
-    setAssigneeId(initialAssigneeId);
-  }, [initialAssigneeId]);
 
   const handleTaskChange = () => {
     router.refresh();
@@ -101,92 +77,44 @@ export function TasksPageClient({
     handleTaskChange();
   };
 
-  const applyFilters = useCallback(() => {
+  const navigateWithFilters = (filters: {
+    q?: string;
+    status?: string;
+    categoryId?: string;
+    assigneeId?: string;
+  }) => {
     startTransition(() => {
-      const params = new URLSearchParams(searchParams?.toString());
-      const trimmed = searchTerm.trim();
-      if (trimmed) {
-        params.set("q", trimmed);
-      } else {
-        params.delete("q");
-      }
-
-      if (status) {
-        params.set("status", status);
-      } else {
-        params.delete("status");
-      }
-
-      if (categoryId) {
-        params.set("categoryId", categoryId);
-      } else {
-        params.delete("categoryId");
-      }
-
-      if (assigneeId) {
-        params.set("assigneeId", assigneeId);
-      } else {
-        params.delete("assigneeId");
-      }
+      const params = new URLSearchParams();
+      if (filters.q) params.set("q", filters.q);
+      if (filters.status) params.set("status", filters.status);
+      if (filters.categoryId) params.set("categoryId", filters.categoryId);
+      if (filters.assigneeId) params.set("assigneeId", filters.assigneeId);
 
       const query = params.toString();
       const url = query ? `${pathname}?${query}` : pathname;
       router.replace(url, { scroll: false });
       router.refresh();
     });
-  }, [
-    assigneeId,
-    categoryId,
-    pathname,
-    router,
-    searchParams,
-    searchTerm,
-    status,
-  ]);
+  };
 
-  const handleSearchSubmit = (event: FormEvent) => {
+  const handleApplyFilters = (event: FormEvent) => {
     event.preventDefault();
-    applyFilters();
+    navigateWithFilters({
+      q: searchTerm.trim(),
+      status,
+      categoryId,
+      assigneeId,
+    });
   };
 
   const handleClearFilters = () => {
+    setSearchTerm("");
     setStatus("");
     setCategoryId("");
     setAssigneeId("");
-    startTransition(() => {
-      const params = new URLSearchParams(searchParams?.toString());
-      params.delete("status");
-      params.delete("categoryId");
-      params.delete("assigneeId");
-      const trimmed = searchTerm.trim();
-      if (trimmed) {
-        params.set("q", trimmed);
-      } else {
-        params.delete("q");
-      }
-      const query = params.toString();
-      const url = query ? `${pathname}?${query}` : pathname;
-      router.replace(url, { scroll: false });
-      router.refresh();
-    });
+    navigateWithFilters({});
   };
 
-  useEffect(() => {
-    if (!hasMountedRef.current) {
-      hasMountedRef.current = true;
-      return;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      applyFilters();
-    }, 350);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [applyFilters]);
-
-  // Filter out the editing task from available blocking tasks
   const filteredBlockingTasks = editingTask
     ? availableBlockingTasks.filter((t) => t.id !== editingTask.id)
     : availableBlockingTasks;
@@ -211,7 +139,7 @@ export function TasksPageClient({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-3" onSubmit={handleSearchSubmit}>
+          <form className="space-y-3" onSubmit={handleApplyFilters}>
             <div className="flex gap-2">
               <Input
                 value={searchTerm}

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -30,6 +30,7 @@ import { signUp } from "@/features/auth/client";
 
 export default function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [pending, setPending] = useState(false);
 
   const form = useForm<SignUpInput>({
@@ -59,8 +60,9 @@ export default function RegisterForm() {
       return;
     }
 
-    // Redirect to household setup since new users don't have a household
-    router.push("/household/setup");
+    // Redirect to specified URL or household setup
+    const redirect = searchParams.get("redirect");
+    router.push(redirect ?? "/household/setup");
   };
 
   return (

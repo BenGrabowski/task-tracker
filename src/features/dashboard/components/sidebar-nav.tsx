@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  CalendarClock,
   FolderOpen,
   Home,
   LayoutDashboard,
@@ -22,11 +21,6 @@ const navItems = [
     title: "All Tasks",
     href: "/dashboard/tasks",
     icon: ListTodo,
-  },
-  {
-    title: "Today & Overdue",
-    href: "/dashboard/tasks/today",
-    icon: CalendarClock,
   },
   {
     title: "Categories",

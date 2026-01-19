@@ -1,8 +1,10 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Copy, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
+import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +14,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FormLabel } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   generateInviteAction,
@@ -20,6 +29,10 @@ import {
 } from "@/features/households/actions/household-actions";
 import { HouseholdNameForm } from "@/features/households/components/household-name-form";
 import { MemberList } from "@/features/households/components/member-list";
+import {
+  type GenerateInviteInput,
+  generateInviteSchema,
+} from "@/features/households/schemas/household-schemas";
 
 interface Household {
   id: string;
@@ -58,12 +71,18 @@ export function HouseholdPageClient({
   currentUserId,
 }: HouseholdPageClientProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [inviteError, setInviteError] = useState<string | null>(null);
-  const [expiresInDays, setExpiresInDays] = useState(7);
-  const [maxUses, setMaxUses] = useState(1);
   const [isInviting, startInviting] = useTransition();
   const [isRevoking, startRevoking] = useTransition();
   const router = useRouter();
+
+  const inviteForm = useForm<GenerateInviteInput>({
+    resolver: zodResolver(generateInviteSchema),
+    defaultValues: {
+      householdId: household.id,
+      expiresInDays: 7,
+      maxUses: 1,
+    },
+  });
 
   const handleSuccess = () => {
     setIsEditing(false);
@@ -77,31 +96,36 @@ export function HouseholdPageClient({
 
   const activeInvites = useMemo(() => invites, [invites]);
 
-  const handleGenerateInvite = () => {
-    setInviteError(null);
+  const handleGenerateInvite = (values: GenerateInviteInput) => {
+    inviteForm.clearErrors();
     startInviting(async () => {
-      const result = await generateInviteAction({
-        householdId: household.id,
-        expiresInDays,
-        maxUses,
-      });
+      const result = await generateInviteAction(values);
 
       if (!result.success) {
-        setInviteError(result.formError ?? "Failed to create invite");
+        if (result.formError) {
+          inviteForm.setError("root", {
+            type: "server",
+            message: result.formError,
+          });
+        }
         return;
       }
 
+      inviteForm.reset();
       router.refresh();
     });
   };
 
   const handleRevokeInvite = (code: string) => {
-    setInviteError(null);
+    inviteForm.clearErrors();
     startRevoking(async () => {
       const result = await revokeInviteAction(code);
 
       if (!result.success) {
-        setInviteError(result.formError ?? "Failed to revoke invite");
+        inviteForm.setError("root", {
+          type: "server",
+          message: result.formError ?? "Failed to revoke invite",
+        });
         return;
       }
 
@@ -177,37 +201,68 @@ export function HouseholdPageClient({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="space-y-2">
-              <FormLabel>Expires in (days)</FormLabel>
-              <Input
-                type="number"
-                min={1}
-                max={30}
-                value={expiresInDays}
-                onChange={(e) => setExpiresInDays(Number(e.target.value))}
-              />
-            </div>
-            <div className="space-y-2">
-              <FormLabel>Max uses</FormLabel>
-              <Input
-                type="number"
-                min={1}
-                max={10}
-                value={maxUses}
-                onChange={(e) => setMaxUses(Number(e.target.value))}
-              />
-            </div>
-          </div>
+          <Form {...inviteForm}>
+            <form
+              onSubmit={inviteForm.handleSubmit(handleGenerateInvite)}
+              className="space-y-4"
+            >
+              <div className="grid gap-3 sm:grid-cols-2">
+                <FormField
+                  control={inviteForm.control}
+                  name="expiresInDays"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Expires in (days)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={1}
+                          max={30}
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={inviteForm.control}
+                  name="maxUses"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Max uses</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={1}
+                          max={10}
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(Number(e.target.value))
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-          <div className="flex items-center gap-3">
-            <Button onClick={handleGenerateInvite} disabled={isInviting}>
-              Generate invite link
-            </Button>
-            {inviteError ? (
-              <p className="text-sm text-destructive">{inviteError}</p>
-            ) : null}
-          </div>
+              <div className="flex items-center gap-3">
+                <Button type="submit" disabled={isInviting}>
+                  Generate invite link
+                </Button>
+                {inviteForm.formState.errors.root?.message ? (
+                  <p className="text-sm text-destructive">
+                    {inviteForm.formState.errors.root.message}
+                  </p>
+                ) : null}
+              </div>
+            </form>
+          </Form>
 
           {activeInvites.length === 0 ? (
             <p className="text-sm text-muted-foreground">

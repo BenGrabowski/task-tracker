@@ -1,10 +1,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CalendarIcon } from "lucide-react";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
@@ -15,6 +17,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -22,6 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import type {
   Category,
   HouseholdMember,
@@ -52,17 +60,14 @@ interface TaskFormProps {
   onCancel?: () => void;
 }
 
-// Format date for datetime-local input
-function formatDateForInput(date: Date | null): string {
-  if (!date) return "";
-  const d = new Date(date);
-  // Format as YYYY-MM-DDTHH:mm for datetime-local
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  const hours = String(d.getHours()).padStart(2, "0");
-  const minutes = String(d.getMinutes()).padStart(2, "0");
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
+// Format date for display
+function formatDate(date: Date | null): string {
+  if (!date) return "Pick a date";
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(date);
 }
 
 const PRIORITY_OPTIONS: { value: TaskPriority; label: string }[] = [
@@ -70,6 +75,9 @@ const PRIORITY_OPTIONS: { value: TaskPriority; label: string }[] = [
   { value: "medium", label: "Medium" },
   { value: "high", label: "High" },
 ];
+
+// Placeholder value for "none" selections (empty string not allowed by Radix Select)
+const NONE_VALUE = "__none__";
 
 export function TaskForm({
   task,
@@ -210,19 +218,35 @@ export function TaskForm({
             control={form.control}
             name="dueDate"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex flex-col">
                 <FormLabel>Due date (optional)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="datetime-local"
-                    {...field}
-                    value={formatDateForInput(field.value)}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      field.onChange(value ? new Date(value) : null);
-                    }}
-                  />
-                </FormControl>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground",
+                        )}
+                      >
+                        {formatDate(field.value)}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value ?? undefined}
+                      onSelect={field.onChange}
+                      disabled={(date) =>
+                        date < new Date(new Date().setHours(0, 0, 0, 0))
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )}
@@ -238,9 +262,9 @@ export function TaskForm({
                 <FormLabel>Assignee (optional)</FormLabel>
                 <Select
                   onValueChange={(val) =>
-                    field.onChange(val === "" ? null : val)
+                    field.onChange(val === NONE_VALUE ? null : val)
                   }
-                  value={field.value ?? ""}
+                  value={field.value ?? NONE_VALUE}
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">
@@ -248,7 +272,7 @@ export function TaskForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="">
+                    <SelectItem value={NONE_VALUE}>
                       <span className="text-muted-foreground">Unassigned</span>
                     </SelectItem>
                     {members.map((member) => (
@@ -271,9 +295,9 @@ export function TaskForm({
                 <FormLabel>Category (optional)</FormLabel>
                 <Select
                   onValueChange={(val) =>
-                    field.onChange(val === "" ? null : val)
+                    field.onChange(val === NONE_VALUE ? null : val)
                   }
-                  value={field.value ?? ""}
+                  value={field.value ?? NONE_VALUE}
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">
@@ -295,7 +319,7 @@ export function TaskForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="">
+                    <SelectItem value={NONE_VALUE}>
                       <span className="text-muted-foreground">No category</span>
                     </SelectItem>
                     {categories.map((category) => (
@@ -324,8 +348,10 @@ export function TaskForm({
             <FormItem>
               <FormLabel>Blocked by (optional)</FormLabel>
               <Select
-                onValueChange={(val) => field.onChange(val === "" ? null : val)}
-                value={field.value ?? ""}
+                onValueChange={(val) =>
+                  field.onChange(val === NONE_VALUE ? null : val)
+                }
+                value={field.value ?? NONE_VALUE}
                 disabled={blockingOptions.length === 0}
               >
                 <FormControl>
@@ -334,16 +360,9 @@ export function TaskForm({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="">
+                  <SelectItem value={NONE_VALUE}>
                     <span className="text-muted-foreground">Not blocked</span>
                   </SelectItem>
-                  {blockingOptions.length === 0 ? (
-                    <SelectItem value="" disabled>
-                      <span className="text-muted-foreground">
-                        No available blockers
-                      </span>
-                    </SelectItem>
-                  ) : null}
                   {blockingOptions.map((blockingTask) => (
                     <SelectItem key={blockingTask.id} value={blockingTask.id}>
                       {blockingTask.title}

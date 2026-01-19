@@ -2,7 +2,16 @@ import Link from "next/link";
 
 import LoginForm from "./login-form";
 
-export default function LoginPage() {
+interface LoginPageProps {
+  searchParams: Promise<{ redirect?: string }>;
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const params = await searchParams;
+  const registerHref = params.redirect
+    ? `/register?redirect=${encodeURIComponent(params.redirect)}`
+    : "/register";
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-md space-y-6">
@@ -17,7 +26,7 @@ export default function LoginPage() {
 
         <p className="text-muted-foreground text-center text-sm">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-foreground underline">
+          <Link href={registerHref} className="text-foreground underline">
             Create one
           </Link>
         </p>

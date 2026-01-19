@@ -47,14 +47,12 @@ export const generateInviteSchema = z.object({
   expiresInDays: z
     .number()
     .min(1, "Expiration must be at least 1 day")
-    .max(30, "Expiration cannot exceed 30 days")
-    .default(7),
+    .max(30, "Expiration cannot exceed 30 days"),
   maxUses: z
     .number()
     .int("Max uses must be an integer")
     .min(1, "Max uses must be at least 1")
-    .max(10, "Max uses cannot exceed 10")
-    .default(1),
+    .max(10, "Max uses cannot exceed 10"),
 });
 
 // Type exports for use in components and actions
