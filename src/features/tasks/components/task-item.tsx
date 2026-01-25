@@ -124,7 +124,7 @@ export function TaskItem({
               {isBlocked && (
                 <Badge
                   variant="outline"
-                  className="text-amber-700 border-amber-300 bg-amber-100 text-xs dark:text-amber-400 dark:border-amber-900"
+                  className="text-white border-orange-600 bg-orange-600 text-xs dark:text-orange-50 dark:border-orange-700 dark:bg-orange-700"
                 >
                   Blocked
                 </Badge>
@@ -132,7 +132,7 @@ export function TaskItem({
               {isBlockingOthers && (
                 <Badge
                   variant="outline"
-                  className="text-sky-700 border-sky-200 bg-sky-50 text-xs dark:text-sky-300 dark:border-sky-900"
+                  className="text-white border-cyan-600 bg-cyan-600 text-xs dark:text-cyan-50 dark:border-cyan-700 dark:bg-cyan-700"
                 >
                   Blocking {dependents.length}
                 </Badge>

@@ -13,9 +13,21 @@ export const auth = betterAuth({
       verification: schema.verification,
     },
   }),
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google"],
+    },
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false, // Set to true in production
+  },
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    },
   },
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
@@ -27,7 +39,7 @@ export const auth = betterAuth({
   },
   secret:
     process.env.BETTER_AUTH_SECRET || "fallback-secret-change-in-production",
-  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+  baseURL: "",
   user: {
     additionalFields: {
       householdId: {

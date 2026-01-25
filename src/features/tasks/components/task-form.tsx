@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon } from "lucide-react";
-import { useTransition } from "react";
+import { useEffect, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
@@ -102,6 +102,19 @@ export function TaskForm({
       blockedByTaskId: task?.blockedByTaskId ?? null,
     },
   });
+
+  // Reset form when task prop changes (e.g., switching from add to edit mode)
+  useEffect(() => {
+    form.reset({
+      title: task?.title ?? "",
+      description: task?.description ?? "",
+      priority: task?.priority ?? "medium",
+      dueDate: task?.dueDate ?? null,
+      assigneeId: task?.assigneeId ?? null,
+      categoryId: task?.categoryId ?? null,
+      blockedByTaskId: task?.blockedByTaskId ?? null,
+    });
+  }, [task, form]);
 
   const blockingOptions = (() => {
     if (!task?.blockedBy || !task.blockedByTaskId) {

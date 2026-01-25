@@ -1,9 +1,9 @@
 import { inferAdditionalFields } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
+// Use relative URL so auth requests go to the same origin automatically
 export const authClient = createAuthClient({
-  baseURL:
-    process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "http://localhost:3000",
+  baseURL: "",
   plugins: [
     inferAdditionalFields({
       user: {
