@@ -39,7 +39,7 @@ export const auth = betterAuth({
   },
   secret:
     process.env.BETTER_AUTH_SECRET || "fallback-secret-change-in-production",
-  baseURL: "",
+  baseURL: process.env.BETTER_AUTH_URL,
   user: {
     additionalFields: {
       householdId: {
