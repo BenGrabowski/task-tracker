@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronDown, SlidersHorizontal } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { type FormEvent, useState, useTransition } from "react";
 
@@ -50,6 +51,9 @@ export function TasksPageClient({
   const [status, setStatus] = useState(initialStatus);
   const [categoryId, setCategoryId] = useState(initialCategoryId);
   const [assigneeId, setAssigneeId] = useState(initialAssigneeId);
+  const [showFilters, setShowFilters] = useState(
+    Boolean(initialStatus || initialCategoryId || initialAssigneeId),
+  );
   const [pending, startTransition] = useTransition();
   const pathname = usePathname();
   const router = useRouter();
@@ -57,6 +61,7 @@ export function TasksPageClient({
   const hasFilters = Boolean(
     searchTerm.trim() || status || categoryId || assigneeId,
   );
+  const activeFilterCount = [status, categoryId, assigneeId].filter(Boolean).length;
 
   const handleTaskChange = () => {
     router.refresh();
@@ -132,13 +137,7 @@ export function TasksPageClient({
       </header>
 
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Search tasks</CardTitle>
-          <CardDescription>
-            Search across task titles and descriptions.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4">
           <form className="space-y-3" onSubmit={handleApplyFilters}>
             <div className="flex gap-2">
               <Input
@@ -146,76 +145,94 @@ export function TasksPageClient({
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search tasks..."
                 autoComplete="off"
+                className="flex-1"
               />
-              <Button type="submit" disabled={pending}>
-                {pending ? "Applying..." : "Apply"}
-              </Button>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-3">
-              <Select
-                value={status || "all"}
-                onValueChange={(value) => setStatus(value === "all" ? "" : value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All statuses</SelectItem>
-                  <SelectItem value="todo">To Do</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="done">Done</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={categoryId || "all"}
-                onValueChange={(value) => setCategoryId(value === "all" ? "" : value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All categories</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={assigneeId || "all"}
-                onValueChange={(value) => setAssigneeId(value === "all" ? "" : value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Assignee" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All assignees</SelectItem>
-                  {members.map((member) => (
-                    <SelectItem key={member.id} value={member.id}>
-                      {member.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex gap-2">
-              <Button type="submit" disabled={pending}>
-                {pending ? "Applying..." : "Apply filters"}
-              </Button>
               <Button
                 type="button"
                 variant="outline"
-                onClick={handleClearFilters}
-                disabled={pending}
+                onClick={() => setShowFilters(!showFilters)}
+                className="gap-1.5"
               >
-                Clear filters
+                <SlidersHorizontal className="h-4 w-4" />
+                <span>Filters</span>
+                {activeFilterCount > 0 && (
+                  <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
+                    {activeFilterCount}
+                  </span>
+                )}
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform ${showFilters ? "rotate-180" : ""}`}
+                />
               </Button>
             </div>
+
+            {showFilters && (
+              <div className="flex flex-wrap items-center gap-2">
+                <Select
+                  value={status || "all"}
+                  onValueChange={(value) => setStatus(value === "all" ? "" : value)}
+                >
+                  <SelectTrigger className="w-[130px]">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All statuses</SelectItem>
+                    <SelectItem value="todo">To Do</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="done">Done</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  value={categoryId || "all"}
+                  onValueChange={(value) => setCategoryId(value === "all" ? "" : value)}
+                >
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All categories</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  value={assigneeId || "all"}
+                  onValueChange={(value) => setAssigneeId(value === "all" ? "" : value)}
+                >
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue placeholder="Assignee" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All assignees</SelectItem>
+                    {members.map((member) => (
+                      <SelectItem key={member.id} value={member.id}>
+                        {member.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <div className="ml-auto flex gap-2">
+                  <Button type="submit" size="sm" disabled={pending}>
+                    {pending ? "Applying..." : "Apply"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClearFilters}
+                    disabled={pending || !hasFilters}
+                  >
+                    Clear
+                  </Button>
+                </div>
+              </div>
+            )}
           </form>
         </CardContent>
       </Card>

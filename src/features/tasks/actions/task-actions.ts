@@ -455,6 +455,19 @@ export async function updateTask(taskId: string, input: UpdateTaskInput) {
       return { success: false, error: "Task not found or access denied" };
     }
 
+    // When a task is marked as done, clear blockedByTaskId for all tasks blocked by it
+    if (validatedData.status === "done" && currentTask.status !== "done") {
+      await db
+        .update(tasks)
+        .set({ blockedByTaskId: null, updatedAt: new Date() })
+        .where(
+          and(
+            eq(tasks.blockedByTaskId, taskId),
+            eq(tasks.householdId, householdId),
+          ),
+        );
+    }
+
     return { success: true, task: updatedTask };
   } catch (error) {
     console.error("Error updating task:", error);

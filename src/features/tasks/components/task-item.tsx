@@ -79,17 +79,28 @@ export function TaskItem({
 }: TaskItemProps) {
   const [pending, startTransition] = useTransition();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [optimisticStatus, setOptimisticStatus] = useState<TaskStatus>(task.status);
+
+  // Sync optimistic state when task prop changes (e.g., after server revalidation)
+  if (task.status !== optimisticStatus && !pending) {
+    setOptimisticStatus(task.status);
+  }
 
   const isBlocked = task.blockedBy !== null && task.blockedBy.status !== "done";
   const isBlockingOthers = dependents.length > 0;
-  const taskIsOverdue = isOverdue(task.dueDate, task.status);
+  const taskIsOverdue = isOverdue(task.dueDate, optimisticStatus);
   const taskIsDueToday = isDueToday(task.dueDate);
+  const isDone = optimisticStatus === "done";
 
   const handleStatusChange = (newStatus: TaskStatus) => {
+    setOptimisticStatus(newStatus);
     startTransition(async () => {
       const result = await updateTask(task.id, { status: newStatus });
       if (result.success) {
         onTaskChange?.();
+      } else {
+        // Revert on failure
+        setOptimisticStatus(task.status);
       }
     });
   };
@@ -106,7 +117,7 @@ export function TaskItem({
 
   return (
     <Card
-      className={`py-3 ${task.status === "done" ? "opacity-60" : ""} ${isBlocked ? "border-amber-200 bg-amber-50/40 dark:border-amber-900/40 dark:bg-amber-900/10" : ""}`}
+      className={`py-3 ${isDone ? "opacity-60" : ""} ${isBlocked ? "border-amber-200 bg-amber-50/40 dark:border-amber-900/40 dark:bg-amber-900/10" : ""}`}
     >
       <CardContent className="pt-0 space-y-3">
         <div className="flex items-start justify-between gap-3">
@@ -114,9 +125,7 @@ export function TaskItem({
             <div className="flex items-center gap-2 flex-wrap">
               <h3
                 className={`font-medium ${
-                  task.status === "done"
-                    ? "line-through text-muted-foreground"
-                    : ""
+                  isDone ? "line-through text-muted-foreground" : ""
                 }`}
               >
                 {task.title}
@@ -152,9 +161,9 @@ export function TaskItem({
 
           <div className="flex items-center gap-2 shrink-0">
             <Select
-              value={task.status}
+              value={optimisticStatus}
               onValueChange={handleStatusChange}
-              disabled={pending || (isBlocked && task.status !== "done")}
+              disabled={pending || (isBlocked && !isDone)}
             >
               <SelectTrigger className="w-[130px] h-8 text-xs">
                 <SelectValue />

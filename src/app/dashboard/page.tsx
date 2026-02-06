@@ -16,16 +16,12 @@ import { requireHousehold } from "@/lib/session";
 
 function StatsSkeleton() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {Array.from({ length: 4 }).map((_, i) => (
-        <Card key={i}>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="size-4" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-8 w-12" />
-          </CardContent>
+        <Card key={i} className="flex-row items-center gap-3 px-4 py-3">
+          <Skeleton className="size-4 shrink-0" />
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="ml-auto h-5 w-6" />
         </Card>
       ))}
     </div>

@@ -6,12 +6,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { getTasks, getTodayTasks } from "@/features/tasks";
 
 export async function DashboardStats() {
@@ -70,24 +65,18 @@ export async function DashboardStats() {
   ];
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (
         <Link key={stat.id} href={stat.href}>
-          <Card className="transition-colors hover:bg-muted/50">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">
-                {stat.title}
-              </CardTitle>
-              <stat.icon className="size-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              {stat.description && (
-                <p className="text-xs text-muted-foreground">
-                  {stat.description}
-                </p>
-              )}
-            </CardContent>
+          <Card className="flex-row items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/50">
+            <stat.icon className="size-4 shrink-0 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">{stat.title}</span>
+            <span className="ml-auto text-lg font-semibold">{stat.value}</span>
+            {stat.description && (
+              <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs text-destructive">
+                {stat.description}
+              </span>
+            )}
           </Card>
         </Link>
       ))}

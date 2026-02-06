@@ -11,9 +11,11 @@
     "format": "biome format --write",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:migrate:prod": "dotenv -e .env.production -- drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:migrate:run": "dotenv tsx src/lib/db/migrate.ts",
+    "db:migrate:run:prod": "dotenv -e .env.production tsx src/lib/db/migrate.ts",
     "db:test": "dotenv tsx src/lib/db/test-connection.ts"
   },
   "dependencies": {
